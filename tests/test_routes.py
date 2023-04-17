@@ -123,6 +123,24 @@ class TestAccountService(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
+    def test_account_str_repr(self):
+        """String representation of account"""
+        account = AccountFactory()
+        tst = f"<Account {account.name} id=[{account.id}]>"
+        self.assertEqual(str(account), tst)
+
+    def test_deserialize_of_account(self):
+        """ Deserialize account """
+        tmp = {
+            "id": 2,
+            "name": 'test',
+            "email": 'test@test.mail',
+            "address": 'self.address',
+            "phone_number": 'self.phone_number'
+        }
+        account = Account().deserialize(tmp)
+        self.assertEqual(account.name, 'test')
+
     # ADD YOUR TEST CASES HERE ...
     def test_read_an_account(self):
         """It should read an account"""
@@ -136,7 +154,7 @@ class TestAccountService(TestCase):
         new_account = response.get_json()
 
         response = self.client.get(
-            BASE_URL + '/' + new_account['id'],
+            BASE_URL + '/' + str(new_account['id']),
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -147,3 +165,11 @@ class TestAccountService(TestCase):
         self.assertEqual(new_account["address"], account.address)
         self.assertEqual(new_account["phone_number"], account.phone_number)
         self.assertEqual(new_account["date_joined"], str(account.date_joined))
+
+    def test_read_an_account_bad_path(self):
+        """It should not read a bad account id"""
+        response = self.client.get(
+            BASE_URL + '/0',
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
