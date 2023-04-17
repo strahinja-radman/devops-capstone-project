@@ -60,8 +60,13 @@ def create_accounts():
 ######################################################################
 # LIST ALL ACCOUNTS
 ######################################################################
-
-# ... place you code here to LIST accounts ...
+@app.route("/accounts", methods=["GET"])
+def list_accounts():
+    """ Lists all accounts in the database and returns a list of dicts
+    """
+    app.logger.info("Request to list all accounts")
+    all_accounts = Account.all()
+    print(all_accounts)
 
 
 ######################################################################
